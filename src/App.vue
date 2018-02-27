@@ -1,13 +1,15 @@
 <template>
     <div id="app">
-        <!-- <img src="./assets/logo.png"> -->
+        <x-header></x-header>
         <router-view/>
     </div>
 </template>
 
 <script>
+import XHeader from '@/components/XHeader';
 export default {
-    name: 'app'
+    name: 'app',
+    components: { XHeader }
 };
 </script>
 

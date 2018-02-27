@@ -84,13 +84,16 @@ module.exports = {
       }
     ]
   },
+  externals: {
+    jquery: "jQuery"
+  },
   plugins: [
     // rem 支持用
-    new webpack.LoaderOptionsPlugin({
-        // webpack 2.0之后， 此配置不能直接写在自定义配置项中， 必须写在此处
-        vue: {
-            postcss: [require('postcss-px2rem')({ remUnit: 75, propWhiteList: [] })]
-        },
-    })
+    // new webpack.LoaderOptionsPlugin({
+    //     // webpack 2.0之后， 此配置不能直接写在自定义配置项中， 必须写在此处
+    //     vue: {
+    //         postcss: [require('postcss-px2rem')({ remUnit: 75 })]
+    //     },
+    // })
   ]
 }

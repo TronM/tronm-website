@@ -1,7 +1,7 @@
 {
-  "name": "template-vue-cli",
+  "name": "tron-m.com",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "description": "tron-m.com website",
   "author": "wellfrog <wellfrog16@gmail.com>",
   "private": true,
   "scripts": {
