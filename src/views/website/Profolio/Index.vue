@@ -15,40 +15,89 @@
             </div>
         </div>
         <div class="row profolio">
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12">11</div>
+            <div class="col-lg-3 col-md-4 col-sm-6 col-12" v-for="item in list" :key="item.id">
+                <img v-bind:src="item.headlineImage" alt="">
+                <div class="mask">
+                    <div class="info">
+                        <h5 v-text="item.headline"></h5>
+                        <router-link :to="{name: 'profolio-detail', params: { id: item.id }}">查看更多</router-link>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10" class="infinite-scroll" v-text="loadInfo"></div>
     </div>
 </template>
 
 <script>
+import api from '@/api/website/profolio';
+// import utils from '@/utils/utils';
 import $ from 'jquery';
 
 export default {
     data() {
         return {
-            x: ''
+            page: 1,
+            pagesize: 8,
+            loadInfo: '加载中',
+            busy: true,
+            list: []
         };
     },
     mounted() {
         this.bindEvents();
     },
+    created() {
+        this.refresh();
+    },
     methods: {
+        refresh() {
+            this.page = 1;
+            this.loadList();
+        },
+        async loadList(flagConcat = false) {
+            const res = await api.list(this.listParams);
+
+            if (res && res.length > 0) {
+                const list = res;
+
+                if (flagConcat) {
+                    this.list = this.list.concat(list);
+                    this.busy = list.length < this.pagesize;
+                    this.loadInfo = list.length < this.pagesize ? '没有更多了' : '加载中';
+                } else {
+                    this.list = list;
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            this.busy = false;
+                            this.loadInfo = '加载中';
+                        }, 500);
+                    });
+                }
+            }
+        },
+        loadMore() {
+            this.busy = true;
+
+            setTimeout(() => {
+                this.page++;
+                this.loadList(true);
+            }, 1000);
+        },
         bindEvents() {
             $('.tags .toggle').on('click', () => {
                 $('.tags .list').toggle();
             });
+        }
+    },
+    computed: {
+        listParams() {
+            let params = {
+                page: this.page,
+                pagesize: this.pagesize
+            };
+
+            return params;
         }
     }
 };
@@ -100,6 +149,43 @@ export default {
 
         >div {
             margin-top: 30px;
+            position: relative;
+
+            &:hover {
+                .mask {
+                    opacity: 1;
+                    transition: all .3s ease-in-out;
+                }
+            }
+
+            img {
+                width: 100%;
+            }
+        }
+
+        .mask {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 15px;
+            right: 15px;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, .5);
+            color: #FFF;
+            text-align: center;
+            line-height: 100%;
+            transition: all .3s ease-in-out;
+
+            a {
+                color: #FFF;
+                font-size: 16px;
+            }
+
+            .info {
+                position: relative;
+                top: 50%;
+                transform: translateY(-50%);
+            }
         }
     }
 }

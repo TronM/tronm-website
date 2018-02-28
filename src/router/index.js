@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Profolio from '@/views/website/Profolio';
 import ProfolioDetail from '@/views/website/Profolio/Detail.vue';
-import ResetPassword from '@/views/website/Guest/ResetPassword.vue';
+import ResetPassword from '@/views/website/Customer/ResetPassword.vue';
 
 Vue.use(Router);
 
@@ -38,7 +38,7 @@ export default new Router({
             ]
         },
         {
-            path: '/guest',
+            path: '/customer',
             component: Root,
             children: [
                 {

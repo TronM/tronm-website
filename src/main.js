@@ -4,6 +4,9 @@ import Vue from 'vue';
 import App from './App';
 import router from './router';
 // import 'lib-flexible/flexible'; // rem 支持用
+import infiniteScroll from 'vue-infinite-scroll';
+
+Vue.use(infiniteScroll);
 
 Vue.config.productionTip = false;
 

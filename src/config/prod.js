@@ -1,14 +1,6 @@
 const config = {
-    everyone: {
-        server: {
-            api: ''
-        }
-    },
-
-    guest: {
-        server: {
-            api: ''
-        }
+    server: {
+        api: 'http://resourceful.test.tron-m.com'
     }
 };
 
