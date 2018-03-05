@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" v-if="isPasswordChanged">
             <div class="card-body">
                 <h5 class="card-title">修改成功</h5>
                 <p class="card-text">即将返回首页</p>
@@ -40,6 +40,7 @@ export default {
     data() {
         return {
             isActive: false,
+            isPasswordChanged: false,
             accessToken: '',
             password: ''
         };
@@ -53,13 +54,14 @@ export default {
             })
             .catch((err) => {
                 console.log(err);
-                // TODO: use vue2-notify
-                // this.$notify.error('用户激活失败');
+                this.$notify.error('用户激活失败');
             });
     },
     methods: {
         async submit() {
             await auth.resetPassword(this.password, this.accessToken);
+            this.isPasswordChanged = true;
+            this.$notify.success('密码修改成功');
             $('#login').modal('show');
         }
     }

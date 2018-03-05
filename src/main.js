@@ -5,8 +5,10 @@ import App from './App';
 import router from './router';
 // import 'lib-flexible/flexible'; // rem 支持用
 import infiniteScroll from 'vue-infinite-scroll';
+import Notify from 'vue2-notify';
 
 Vue.use(infiniteScroll);
+Vue.use(Notify, { visibility: 2000, position: 'bottom-full' });
 
 Vue.config.productionTip = false;
 
