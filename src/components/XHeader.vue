@@ -13,18 +13,18 @@
                 <div class="form-group row">
                     <label for="inputUsername" class="col-sm-3 col-form-label">用户名</label>
                     <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputUsername" placeholder="用户名">
+                    <input type="text" class="form-control" placeholder="用户名" v-model="form.fields.username" >
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword2" class="col-sm-3 col-form-label">密码</label>
                     <div class="col-sm-9">
-                    <input type="password" class="form-control" id="inputPassword2" placeholder="确认新密码">
+                    <input type="password" class="form-control" placeholder="确认新密码" v-model="form.fields.password">
                     </div>
                 </div>
             </template>
             <template slot="footer">
-                <button type="button" class="btn btn-primary">登入</button>
+                <button type="button" class="btn btn-primary" @click="login()">登入</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
             </template>
         </Modal>
@@ -32,13 +32,21 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal.vue';
 import $ from 'jquery';
+import Modal from '@/components/Modal.vue';
+import auth from '@/api/website/auth';
 
 export default {
     components: { Modal },
     data() {
-        return {};
+        return {
+            form: {
+                fields: {
+                    username: 'rita',
+                    password: 'admin'
+                }
+            }
+        };
     },
     mounted() {
         // $('#login').on('shown.bs.modal', function () {
@@ -47,6 +55,19 @@ export default {
         $('header .user').on('click', () => {
             $('#login').modal('show');
         });
+    },
+    methods: {
+        async login() {
+            try {
+                await auth.login({ username: this.form.fields.username, password: this.form.fields.password });
+                this.$router.push({ path: '/' });
+            } catch (err) {
+                this.$notify.error({
+                    title: '错误',
+                    message: '登陆失败'
+                });
+            }
+        }
     }
 };
 </script>

@@ -1,6 +1,12 @@
 const config = {
     server: {
-        api: 'http://resourceful.test.tron-m.com'
+        iam: 'http://iam.test.tron-m.com',
+        oauth2: 'http://oauth2.test.tron-m.com',
+        api: 'http://resourceful.test.tron-m.com',
+        img: 'http://minio-api.test.tron-m.com/bucket/tronm/object'
+    },
+    upload: {
+        url: 'http://minio-api.test.tron-m.com/bucket/tronm/object'
     }
 };
 

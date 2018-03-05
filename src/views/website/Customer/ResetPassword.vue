@@ -17,7 +17,7 @@
                 </div>
                 <div class="row confirm">
                     <div class="col-12">
-                        <button type="button" class="btn btn-primary">确认修改</button>
+                        <button type="button" class="btn btn-primary" @click="submit()" :disabled="!isActive">确认修改</button>
                     </div>
                 </div>
             </div>
@@ -33,9 +33,35 @@
 </template>
 
 <script>
+import $ from 'jquery';
+import auth from '@/api/website/auth';
+
 export default {
     data() {
-        return {};
+        return {
+            isActive: false,
+            accessToken: '',
+            password: ''
+        };
+    },
+    mounted() {
+        this.accessToken = this.$route.query.access_token;
+        auth.activate(this.accessToken)
+            .then(() => {
+                this.isActive = true;
+                this.$notify.success('用户激活成功，你现在可以修改初始密码了。');
+            })
+            .catch((err) => {
+                console.log(err);
+                // TODO: use vue2-notify
+                // this.$notify.error('用户激活失败');
+            });
+    },
+    methods: {
+        async submit() {
+            await auth.resetPassword(this.password, this.accessToken);
+            $('#login').modal('show');
+        }
     }
 };
 </script>

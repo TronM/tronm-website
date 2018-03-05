@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import api from '@/api/website/profolio';
+import resource from '@/api/website/resource';
 // import utils from '@/utils/utils';
 import $ from 'jquery';
 
@@ -56,7 +56,7 @@ export default {
             this.loadList();
         },
         async loadList(flagConcat = false) {
-            const res = await api.list(this.listParams);
+            const res = await resource.getPortfolios(this.listParams);
 
             if (res && res.length > 0) {
                 const list = res;
