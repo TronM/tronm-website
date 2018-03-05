@@ -12,101 +12,6 @@ const USER_ROLES_KEY = 'roles';
 const iam = axios.create({ baseURL: config.server.iam });
 const oauth2 = axios.create({ baseURL: config.server.oauth2 });
 
-function setExpiresIn(expiresIn) {
-    return localStorage.setItem(EXPIRES_IN_KEY, expiresIn);
-}
-
-function getExpiresIn() {
-    return localStorage.getItem(EXPIRES_IN_KEY);
-}
-
-function getTokenExpirationDate() {
-    const expiresIn = getExpiresIn();
-    if (!expiresIn) {
-        return null;
-    }
-    const date = new Date(0);
-    date.setUTCSeconds(expiresIn);
-    return date;
-}
-
-function isTokenExpired() {
-    const expirationDate = getTokenExpirationDate();
-    return expirationDate < new Date();
-}
-
-function setRefreshToken(refreshToken) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-}
-
-function getRefreshToken() {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
-function clearRefreshToken() {
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-}
-
-function setAccessToken(accessToken) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-}
-
-async function getAccessToken() {
-    if (isTokenExpired()) {
-        await refreshAccessToken();
-    }
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
-}
-
-async function refreshAccessToken() {
-    const refreshToken = getRefreshToken();
-    if (refreshToken !== null) {
-        const data = {
-            grant_type: 'refresh_token',
-            refresh_token: refreshToken
-        };
-        const {
-            access_token: accessToken,
-            expires_in: expiresIn
-        } = await oauth2.post('/oauth2/token', $.param(data), {
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic dHJvbm06MTIzcXdlIUAj'
-            }
-        });
-        setAccessToken(accessToken);
-        setExpiresIn(expiresIn);
-    }
-}
-
-function clearAccessToken() {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-}
-
-function setTokenType(tokenType) {
-    localStorage.setItem(TOKEN_TYPE_KEY, tokenType);
-}
-
-function getTokenType() {
-    return localStorage.getItem(TOKEN_TYPE_KEY);
-}
-
-function setUsername(username) {
-    localStorage.setItem(USER_KEY, username);
-}
-
-function clearUsername() {
-    localStorage.removeItem(USER_KEY);
-}
-
-function setUserRoles(roles) {
-    localStorage.setItem(USER_ROLES_KEY, JSON.stringify(roles));
-}
-
-function clearUserRoles() {
-    localStorage.removeItem(USER_ROLES_KEY);
-}
-
 function hasUserRole(role) {
     const value = localStorage.getItem(USER_ROLES_KEY);
     if (value === null) return false;
@@ -122,10 +27,50 @@ function isCustomer() {
     return hasUserRole('customer');
 }
 
+function getTokenExpirationDate() {
+    const expiresIn = localStorage.getItem(EXPIRES_IN_KEY) || 0;
+    const date = new Date(0);
+    date.setUTCSeconds(expiresIn);
+    return date;
+}
+
+function isTokenExpired() {
+    const expirationDate = getTokenExpirationDate();
+    return expirationDate < new Date();
+}
+
+async function getAccessToken() {
+    if (isTokenExpired()) {
+        await refreshAccessToken();
+    }
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (refreshToken !== null) {
+        const data = {
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken
+        };
+        const {
+            access_token: accessToken,
+            expires_in: expiresIn
+        } = await oauth2.post('/oauth2/token', $.param(data), {
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic dHJvbm06MTIzcXdlIUAj'
+            }
+        });
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        localStorage.setItem(EXPIRES_IN_KEY, expiresIn);
+    }
+}
+
 async function getAuthorizationHeader(accessToken) {
     const token = accessToken || await getAccessToken();
     if (token !== null) {
-        const tokenType = getTokenType() || 'Bearer';
+        const tokenType = localStorage.getItem(TOKEN_TYPE_KEY) || 'Bearer';
         return `${tokenType} ${token}`;
     }
 }
@@ -137,31 +82,30 @@ async function login({ username, password }) {
         token_type: tokenType,
         expires_in: expiresIn
     } = await iam.post('/signin', { username, password });
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
-    setTokenType(tokenType);
-    setExpiresIn(expiresIn);
-    setUsername(username);
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    localStorage.setItem(TOKEN_TYPE_KEY, tokenType);
+    localStorage.setItem(EXPIRES_IN_KEY, expiresIn);
+    localStorage.setItem(USER_KEY, username);
     const roles = await iam.get(`/user/${username}/role`, {
         headers: {
             'Authorization': `${tokenType} ${accessToken}`
         }
     });
-    console.log('get roles', roles);
-    setUserRoles(roles);
+    localStorage.setItem(USER_ROLES_KEY, JSON.stringify(roles));
 }
 
 async function logout() {
     const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken();
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     await iam.post('/signout', {
         access_token: accessToken,
         refresh_token: refreshToken
     });
-    clearAccessToken();
-    clearRefreshToken();
-    clearUsername();
-    clearUserRoles();
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(USER_ROLES_KEY);
 }
 
 async function activate(accessToken) {
@@ -179,7 +123,6 @@ async function resetPassword(password, accessToken) {
 export default {
     getAccessToken,
     refreshAccessToken,
-    getTokenType,
     getAuthorizationHeader,
     login,
     logout,
