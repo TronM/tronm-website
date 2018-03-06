@@ -27,6 +27,7 @@ async function getPortfolios({ page, pagesize }) {
         }
     } catch (err) {
         console.log('Authenticated failed');
+        console.log('Added for end of line style test. Please remove me after success');
     }
     portfolios = await instance.get('/guest_portfolio', { params });
     return portfolios;
