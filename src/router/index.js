@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Profolio from '@/views/website/Profolio';
-import ProfolioDetail from '@/views/website/Profolio/Detail.vue';
+import Portfolio from '@/views/website/portfolio';
+import PortfolioDetail from '@/views/website/portfolio/Detail.vue';
 import ResetPassword from '@/views/website/Customer/ResetPassword.vue';
 
 Vue.use(Router);
@@ -19,21 +19,21 @@ export default new Router({
         {
             path: '/',
             name: 'home',
-            redirect: '/profolio'
+            redirect: '/portfolio'
         },
         {
-            path: '/profolio',
+            path: '/portfolio',
             component: Root,
             children: [
                 {
                     path: '/',
-                    name: 'profolio',
-                    component: Profolio
+                    name: 'portfolio',
+                    component: Portfolio
                 },
                 {
                     path: 'detail/:id',
-                    name: 'profolio-detail',
-                    component: ProfolioDetail
+                    name: 'portfolio-detail',
+                    component: PortfolioDetail
                 }
             ]
         },

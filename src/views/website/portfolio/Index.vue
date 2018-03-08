@@ -1,26 +1,22 @@
 <template>
-    <div class="profolio-list container-fluid">
+    <div class="portfolio-list container-fluid">
         <div class="row tags">
-            <div class="col-10 col-sm-12 offset-1 offset-sm-0">
+            <div class="col-sm-12 col-md-10 offset-sm-0 offset-md-1">
                 <div class="toggle">所有项目分类</div>
                 <ul class="list">
-                    <li>HTML5</li>
-                    <li>CSS3</li>
-                    <li>Javascript</li>
-                    <li>PHP</li>
-                    <li>Nodejs</li>
-                    <li>Vue</li>
-                    <li>Angular</li>
+                    <li v-for="item in tags" :key="item.name">
+                        {{ item.name }}
+                    </li>
                 </ul>
             </div>
         </div>
-        <div class="row profolio">
-            <div class="col-lg-3 col-md-4 col-sm-6 col-12" v-for="item in list" :key="item.id">
+        <div class="row portfolio">
+            <div class="col-lg-3 col-md-4 col-sm-6" v-for="item in list" :key="item.id">
                 <img v-bind:src="item.headlineImage" alt="">
                 <div class="mask">
                     <div class="info">
                         <h5 v-text="item.headline"></h5>
-                        <router-link :to="{name: 'profolio-detail', params: { id: item.id }}">查看更多</router-link>
+                        <router-link :to="{name: 'portfolio-detail', params: { id: item.id }}">查看更多</router-link>
                     </div>
                 </div>
             </div>
@@ -41,14 +37,14 @@ export default {
             pagesize: 8,
             loadInfo: '加载中',
             busy: true,
-            list: []
+            list: [],
+            tags: ['111', '2222']
         };
     },
     mounted() {
         this.bindEvents();
-    },
-    created() {
         this.refresh();
+        this.loadTags();
     },
     methods: {
         refresh() {
@@ -75,6 +71,10 @@ export default {
                     });
                 }
             }
+        },
+        async loadTags() {
+            const res = await resource.getTags();
+            this.tags = res;
         },
         loadMore() {
             this.busy = true;
@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style lang="less">
-.profolio-list {
+.portfolio-list {
     .tags {
         margin-top: 20px;
 
@@ -144,7 +144,7 @@ export default {
         }
     }
 
-    .profolio {
+    .portfolio {
         margin: 0 50px;
 
         >div {
@@ -191,7 +191,7 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-.profolio-list {
+.portfolio-list {
     .tags {
         .toggle {
             display: block;
@@ -210,7 +210,7 @@ export default {
         }
     }
 
-    .profolio {
+    .portfolio {
         margin: 0;
     }
 }

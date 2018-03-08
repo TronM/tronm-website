@@ -14,6 +14,8 @@ export default {
 </script>
 
 <style lang="less">
+@import url('./assets/style/icon.less');
+
 html, body {
     padding: 0;
     margin: 0;

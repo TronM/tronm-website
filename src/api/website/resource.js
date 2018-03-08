@@ -32,18 +32,41 @@ async function getPortfolios({ page, pagesize }) {
     return portfolios;
 }
 
+// 临时复制粘贴增加，获取单个信息
+async function getPortfoliosDetail(id) {
+    let portfolios;
+    try {
+        const accessToken = await auth.getAccessToken();
+        const authorizationHeader = await auth.getAuthorizationHeader(accessToken);
+        if (authorizationHeader) {
+            const headers = { 'Authorization': authorizationHeader };
+            if (auth.isAdmin()) {
+                portfolios = await instance.get(`/portfolio/${id}`, { headers });
+            } else if (auth.isCustomer()) {
+                portfolios = await instance.get(`/customer_portfolio/${id}`, { headers });
+            }
+            return portfolios;
+        }
+    } catch (err) {
+        console.log('Authenticated failed');
+    }
+    portfolios = await instance.get(`/guest_portfolio/${id}`);
+    return portfolios;
+}
+
 async function getArticles() {
     const articles = await instance.get('/articles');
     return articles;
 }
 
 async function getTags() {
-    const tags = await instance.get('/tags');
+    const tags = await instance.get('/tag');
     return tags;
 }
 
 export default {
     getPortfolios,
+    getPortfoliosDetail,
     getArticles,
     getTags
 };

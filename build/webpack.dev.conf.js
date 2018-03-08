@@ -35,7 +35,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     },
     before(app) {
-      app.get('/mock/profolio', (req, res) => {
+      app.get('/mock/portfolio', (req, res) => {
         res.json({'msg':'ok'});
       })
     }
