@@ -4,7 +4,7 @@
             <div class="col-sm-12 col-md-10 offset-sm-0 offset-md-1">
                 <div class="toggle">所有项目分类</div>
                 <ul class="list">
-                    <li v-for="item in tags" :key="item.name">
+                    <li v-for="item in tags" :key="item.name" @click="filterTag(item.name)" :class="{ 'active': selectedTag === item.name }">
                         {{ item.name }}
                     </li>
                 </ul>
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10" class="infinite-scroll" v-text="loadInfo"></div>
+        <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10" class="infinite-scroll list-more" v-text="loadInfo"></div>
     </div>
 </template>
 
@@ -37,19 +37,42 @@ export default {
             pagesize: 8,
             loadInfo: '加载中',
             busy: true,
+            selectedTag: -1,
+            filters: {
+                tag: ''
+            },
             list: [],
             tags: ['111', '2222']
         };
     },
     mounted() {
+        this.setFilters();
         this.bindEvents();
         this.refresh();
         this.loadTags();
+    },
+    beforeRouteLeave(from, to, next) {
+        console.log(123);
+        next();
     },
     methods: {
         refresh() {
             this.page = 1;
             this.loadList();
+        },
+        setFilters() {
+            if (this.$route.params.tag) {
+                this.filters.tag = this.$route.params.tag;
+                this.selectedTag = this.$route.params.tag;
+            } else {
+                this.filters.tag = '';
+            }
+        },
+        filterTag(name) {
+            this.$router.push({ name: 'portfolio-index', params: { tag: name } });
+            this.selectedTag = name;
+            this.filters.tag = name;
+            this.refresh();
         },
         async loadList(flagConcat = false) {
             const res = await resource.getPortfolios(this.listParams);
@@ -59,17 +82,27 @@ export default {
 
                 if (flagConcat) {
                     this.list = this.list.concat(list);
+
+                    // 如果获取的数量小于分页数，则表示没有数据了
                     this.busy = list.length < this.pagesize;
                     this.loadInfo = list.length < this.pagesize ? '没有更多了' : '加载中';
                 } else {
                     this.list = list;
-                    this.$nextTick(() => {
-                        setTimeout(() => {
-                            this.busy = false;
-                            this.loadInfo = '加载中';
-                        }, 500);
-                    });
+
+                    // 如果获取的数量刚好等于分页数，则表示可能还有数据
+                    if (list.length === this.pagesize) {
+                        this.$nextTick(() => {
+                            setTimeout(() => {
+                                this.busy = false;
+                                this.loadInfo = '加载中';
+                            }, 500);
+                        });
+                    } else {
+                        this.loadInfo = '没有更多了';
+                    }
                 }
+            } else {
+                this.loadInfo = '没有更多了';
             }
         },
         async loadTags() {
@@ -94,7 +127,8 @@ export default {
         listParams() {
             let params = {
                 page: this.page,
-                pagesize: this.pagesize
+                pagesize: this.pagesize,
+                filters: this.filters
             };
 
             return params;
@@ -136,7 +170,7 @@ export default {
                 text-decoration: none;
                 cursor: pointer;
 
-                &:hover {
+                &:hover, &.active {
                     color: #49c5b6;
                     border-color: #49c5b6;
                 }
@@ -187,6 +221,11 @@ export default {
                 transform: translateY(-50%);
             }
         }
+    }
+
+    .list-more {
+        text-align: center;
+        line-height: 60px;
     }
 }
 

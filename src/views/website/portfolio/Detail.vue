@@ -37,6 +37,8 @@
 import resource from '@/api/website/resource';
 import $ from 'jquery';
 
+// qr 和 share 有缺陷，todo
+
 export default {
     data() {
         return {

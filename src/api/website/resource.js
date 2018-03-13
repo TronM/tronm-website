@@ -5,13 +5,18 @@ import auth from './auth';
 
 const instance = axios.create({ baseURL: config.server.api });
 
-async function getPortfolios({ page, pagesize }) {
+async function getPortfolios({ page, pagesize, filters }) {
     const params = {
         rnd: new Date().getTime(), // 防止缓存
         sort: { 'created': -1 },
         limit: pagesize,
         offset: (page - 1) * pagesize
     };
+
+    if (filters && filters.tag !== '') {
+        params.filters = {'tag': {'$in': [filters.tag]}};
+    }
+
     let portfolios;
     try {
         const accessToken = await auth.getAccessToken();

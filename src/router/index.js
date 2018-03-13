@@ -19,15 +19,20 @@ export default new Router({
         {
             path: '/',
             name: 'home',
-            redirect: '/portfolio'
+            redirect: '/portfolio/index'
         },
         {
             path: '/portfolio',
             component: Root,
             children: [
                 {
-                    path: '/',
+                    path: 'index',
                     name: 'portfolio',
+                    component: Portfolio
+                },
+                {
+                    path: 'index/:tag',
+                    name: 'portfolio-index',
                     component: Portfolio
                 },
                 {
