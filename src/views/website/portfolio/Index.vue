@@ -4,7 +4,10 @@
             <div class="col-sm-12 col-md-10 offset-sm-0 offset-md-1">
                 <div class="toggle">所有项目分类</div>
                 <ul class="list">
-                    <li v-for="item in tags" :key="item.name" @click="filterTag(item.name)" :class="{ 'active': selectedTag === item.name }">
+                    <li v-for="item in tags"
+                        :key="item.name"
+                        @click="$router.push({ name: 'portfolio-index', params: { tag: item.name } })"
+                        :class="{ 'active': filters.tag === item.name }">
                         {{ item.name }}
                     </li>
                 </ul>
@@ -37,7 +40,6 @@ export default {
             pagesize: 8,
             loadInfo: '加载中',
             busy: true,
-            selectedTag: -1,
             filters: {
                 tag: ''
             },
@@ -46,33 +48,21 @@ export default {
         };
     },
     mounted() {
-        this.setFilters();
         this.bindEvents();
         this.refresh();
         this.loadTags();
     },
-    beforeRouteLeave(from, to, next) {
-        console.log(123);
+    beforeRouteUpdate(to, from, next) {
+        this.setFilterTag(to);
         next();
+    },
+    beforeRouteEnter(to, from, next) {
+        next(vm => vm.setFilterTag(to));
     },
     methods: {
         refresh() {
             this.page = 1;
             this.loadList();
-        },
-        setFilters() {
-            if (this.$route.params.tag) {
-                this.filters.tag = this.$route.params.tag;
-                this.selectedTag = this.$route.params.tag;
-            } else {
-                this.filters.tag = '';
-            }
-        },
-        filterTag(name) {
-            this.$router.push({ name: 'portfolio-index', params: { tag: name } });
-            this.selectedTag = name;
-            this.filters.tag = name;
-            this.refresh();
         },
         async loadList(flagConcat = false) {
             const res = await resource.getPortfolios(this.listParams);
@@ -104,6 +94,11 @@ export default {
             } else {
                 this.loadInfo = '没有更多了';
             }
+        },
+        setFilterTag(route) {
+            const tag = route.params.tag || '';
+            this.filters.tag = tag;
+            this.refresh();
         },
         async loadTags() {
             const res = await resource.getTags();

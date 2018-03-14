@@ -3,7 +3,7 @@
         <section class="kv">
             <img :src="detail.kv" alt="">
             <div class="button">
-                <span class="icon icon-pc"></span>
+                <a class="icon icon-pc" :href="`http://${detail.browseUrl.pc}`" target="_blank"></a>
                 <span class="icon icon-mobile" @click="show.qr = !show.qr">
                     <div class="qr-box" :class="{ 'qr-hidden': !show.qr }">
                         <div class="qr"></div>
@@ -15,8 +15,8 @@
                 <span class="icon icon-weixin" :class="{ hidden: !show.share }"></span>
             </div>
             <div class="page">
-                <span class="icon icon-prev"></span>
-                <span class="icon icon-next"></span>
+                <span class="icon icon-prev" @click="linkto('prev')"></span>
+                <span class="icon icon-next" @click="linkto('next')"></span>
             </div>
         </section>
         <section class="category col-sm-12 col-md-10 offset-sm-0 offset-md-1">
@@ -35,33 +35,50 @@
 
 <script>
 import resource from '@/api/website/resource';
+import portfolio from '@/api/website/portfolio';
 import $ from 'jquery';
-
-// qr 和 share 有缺陷，todo
 
 export default {
     data() {
         return {
+            sibling: {
+                prev: { id: '' },
+                next: { id: '' }
+            },
             show: {
                 qr: false,
                 share: false
             },
             detail: {
-                tag: ['111', '222']
+                tag: [],
+                browseUrl: {
+                    h5: '',
+                    pc: ''
+                }
             }
         };
+    },
+    beforeRouteUpdate(to, from, next) {
+        this.loadInfo(to);
+        next();
     },
     mounted() {
         this.loadInfo();
     },
     methods: {
-        async loadInfo() {
-            const res = await resource.getPortfoliosDetail(this.$route.params.id);
+        async loadInfo(route) {
+            route = route || this.$route;
+            const res = await resource.getPortfoliosDetail(route.params.id);
 
             if (res) {
                 this.detail = res;
-
+                this.sibling = await portfolio.sibling(res.id);
                 $('.qr').qrcode({width: 60, height: 60, text: res.browseUrl.h5});
+            }
+        },
+        linkto(param) {
+            if (this.sibling[param]) {
+                this.$router.push({ name: 'portfolio-detail', params: { id: this.sibling[param].id } });
             }
         }
     }
@@ -74,7 +91,7 @@ export default {
         position: relative;
 
         >img {
-            height: 500px;
+            // height: 500px;
             width: 100%;
         }
 
@@ -92,10 +109,10 @@ export default {
             font-size: 0px;
         }
 
-        span {
+        span, a {
             margin: 0 8px;
             cursor: pointer;
-            transition-property: opacity, transform, left;
+            transition-property: opacity, transform, left, visibility;
             transition-duration: .4s;
             transition-timing-function: ease-in-out;
             position: relative;
@@ -107,6 +124,7 @@ export default {
                 transform: scale(0.5) rotate(-180deg);
                 left: -51px;
                 z-index: 0;
+                visibility: hidden;
             }
         }
 
@@ -116,7 +134,7 @@ export default {
             height: 70px;
             border: 4px solid #49c5b6;
             transform: translate(-50%, -120%);
-            transition-property: opacity, transform;
+            transition-property: opacity, transform, visibility;
             transition-duration: .3s;
             transition-timing-function: ease-in-out;
             left: 50%;
@@ -135,6 +153,7 @@ export default {
             opacity: 0;
             transform: translate(-50%, -90%);
             z-index: 0;
+            visibility: hidden;
         }
 
         .triangle {
