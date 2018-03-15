@@ -29,7 +29,8 @@ function isCustomer() {
 
 function getTokenExpirationDate() {
     const expiresIn = localStorage.getItem(EXPIRES_IN_KEY) || 0;
-    const date = new Date(0);
+    // const date = new Date(0);    // 不知道为什么老魏设置0，导致永远过期
+    const date = new Date();
     date.setUTCSeconds(expiresIn);
     return date;
 }
@@ -96,7 +97,7 @@ async function login({ username, password }) {
 }
 
 async function logout() {
-    const accessToken = getAccessToken();
+    const accessToken = await getAccessToken();
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     await iam.post('/signout', {
         access_token: accessToken,

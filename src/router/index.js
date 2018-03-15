@@ -23,24 +23,13 @@ export default new Router({
         },
         {
             path: '/portfolio',
-            component: Root,
-            children: [
-                {
-                    path: '/',
-                    name: 'portfolio',
-                    component: Portfolio
-                },
-                {
-                    path: ':tag',
-                    name: 'portfolio-index',
-                    component: Portfolio
-                },
-                {
-                    path: 'detail/:id',
-                    name: 'portfolio-detail',
-                    component: PortfolioDetail
-                }
-            ]
+            name: 'portfolio',
+            component: Portfolio
+        },
+        {
+            path: '/portfolio/:id',
+            name: 'portfolio-detail',
+            component: PortfolioDetail
         },
         {
             path: '/customer',

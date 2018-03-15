@@ -6,7 +6,7 @@
                 <ul class="list">
                     <li v-for="item in tags"
                         :key="item.name"
-                        @click="$router.push({ name: 'portfolio-index', params: { tag: item.name } })"
+                        @click="$router.push({ name: 'portfolio', query: { tag: item.name } })"
                         :class="{ 'active': filters.tag === item.name }">
                         {{ item.name }}
                     </li>
@@ -96,7 +96,7 @@ export default {
             }
         },
         setFilterTag(route) {
-            const tag = route.params.tag || '';
+            const tag = route.query.tag || '';
             this.filters.tag = tag;
             this.refresh();
         },

@@ -14,7 +14,7 @@ async function getPortfolios({ page, pagesize, filters }) {
     };
 
     if (filters && filters.tag !== '') {
-        params.filters = {'tag': {'$in': [filters.tag]}};
+        params.filters = {'tag': {'$in': filters.tag.split(',')}};
     }
 
     let portfolios;

@@ -24,13 +24,14 @@ const sibling = async id => {
             } else if (auth.isCustomer()) {
                 portfolios = await instance.get('/customer_portfolio', { headers, params });
             }
-            return portfolios;
+            // return portfolios;
         }
     } catch (err) {
         console.log('Authenticated failed');
     }
-    portfolios = await instance.get('/guest_portfolio', { params });
+    portfolios = portfolios || await instance.get('/guest_portfolio', { params });
 
+    // todo: cookie缓存
     let result = {};
     for (const index in portfolios) {
         if (id === portfolios[index].id) {
