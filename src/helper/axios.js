@@ -5,19 +5,16 @@ const create = ({ baseURL }) => {
         baseURL,
         timeout: 5000
     });
-    instance.interceptors.response.use(response => {
-        return filter(response);
-    }, err => {
-        return filter(err.response);
-    });
+    instance.interceptors.response.use(res => handle(res), err => handle(err.response));
     return instance;
 };
 
-const filter = response => {
-    return {
-        status: response.status,
-        data: response.data
-    };
+const handle = res => {
+    return res.data;
+    // return {
+    //     status: res.status,
+    //     data: res.data
+    // };
 };
 
 export default {
