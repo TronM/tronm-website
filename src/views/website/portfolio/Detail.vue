@@ -3,7 +3,7 @@
         <section class="kv">
             <img :src="detail.kv" alt="">
             <div class="button">
-                <a class="icon icon-pc" :href="`http://${detail.browseUrl.pc}`" target="_blank"></a>
+                <a class="icon icon-pc" :href="detail.browseUrl.pc" target="_blank"></a>
                 <span class="icon icon-mobile" @click="show.qr = !show.qr">
                     <div class="qr-box" :class="{ 'qr-hidden': !show.qr }">
                         <div class="qr"></div>
@@ -11,7 +11,7 @@
                     </div>
                 </span>
                 <span class="icon icon-share" @click="show.share = !show.share"></span>
-                <span class="icon icon-weibo" :class="{ hidden: !show.share }"></span>
+                <span class="icon icon-weibo" :class="{ hidden: !show.share }" @click="share('weibo')"></span>
                 <span class="icon icon-weixin" :class="{ hidden: !show.share }"></span>
             </div>
             <div class="page">
@@ -73,12 +73,17 @@ export default {
             if (res) {
                 this.detail = res;
                 this.sibling = await portfolio.sibling(res.id);
-                $('.qr').qrcode({width: 60, height: 60, text: res.browseUrl.h5});
+                $('.qr').empty().qrcode({width: 60, height: 60, text: res.browseUrl.h5});
             }
         },
         linkto(param) {
             if (this.sibling[param]) {
                 this.$router.push({ name: 'portfolio-detail', params: { id: this.sibling[param].id } });
+            }
+        },
+        share(param) {
+            if (param === 'weibo') {
+                window.open('http://v.t.sina.com.cn/share/share.php?appkey=&title=' + encodeURIComponent(this.detail.headline) + '&url=' + encodeURIComponent(this.detail.browseUrl.pc) + '&pic=' + this.detail.headlineImage);
             }
         }
     }
