@@ -7,7 +7,7 @@
                     <li v-for="item in tags"
                         :key="item.name"
                         @click="$router.push({ name: 'portfolio', query: { tag: item.name } })"
-                        :class="{ 'active': filters.tag === item.name }">
+                        :class="{ 'active': filters.tag.split(',').indexOf(item.name) !== -1 }">
                         {{ item.name }}
                     </li>
                 </ul>

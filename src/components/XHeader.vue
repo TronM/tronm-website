@@ -59,7 +59,7 @@ export default {
         $('#login').on('shown.bs.modal', () => {
             $('.username').trigger('focus');
         });
-        $('header .user').on('click', () => {
+        $('header .user span').on('click', () => {
             if (this.nick) { return; }
             $('#login').modal('show');
         });
@@ -149,7 +149,7 @@ header {
     }
 
     .modal-dialog {
-        top: 50%;
+        top: 50vh;
         transform: translateY(-60%) !important;
 
         .loginError {
